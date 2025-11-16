@@ -2,9 +2,6 @@
 
 [![Model Card](https://img.shields.io/badge/%F0%9F%A4%97%20Model_Card-Huggingface-orange)](https://huggingface.co/stabilityai/TripoSR) [![Gradio Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Gradio%20Demo-Huggingface-orange)](https://huggingface.co/spaces/stabilityai/TripoSR) [![Paper](https://img.shields.io/badge/%F0%9F%A4%97%20Paper-Huggingface-orange)](https://huggingface.co/papers/2403.02151) [![ArXiv](https://img.shields.io/badge/Arxiv-2403.02151-B31B1B.svg)](https://arxiv.org/abs/2403.02151)
 
-<p align="center">
-  <img src="figures/teaser800.gif" alt="Teaser" />
-</p>
 
 Overview
 --------
