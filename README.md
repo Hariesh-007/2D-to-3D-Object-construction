@@ -104,8 +104,3 @@ License
 -------
 This project is provided under the MIT license.
 
-Contributing / Next steps
--------------------------
-
-- If you want, I can add a short example section showing a full command + resulting filenames from a sample run.
-- I can also run the local Gradio demo and provide copy-paste commands for Windows PowerShell to launch it.
