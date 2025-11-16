@@ -1,77 +1,114 @@
-# 2D to 3D <a href="https://huggingface.co/stabilityai/TripoSR"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Model_Card-Huggingface-orange"></a> <a href="https://huggingface.co/spaces/stabilityai/TripoSR"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Gradio%20Demo-Huggingface-orange"></a> <a href="https://huggingface.co/papers/2403.02151"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Paper-Huggingface-orange"></a> <a href="https://arxiv.org/abs/2403.02151"><img src="https://img.shields.io/badge/Arxiv-2403.02151-B31B1B.svg"></a> <a href="https://discord.gg/mvS9mCfMnQ"><img src="https://img.shields.io/badge/Discord-%235865F2.svg?logo=discord&logoColor=white"></a>
+﻿# 2D to 3D  README
 
-<div align="center">
-  <img src="figures/teaser800.gif" alt="Teaser Video">
-</div>
-
-This is the official codebase for **2D to 3D**, a state-of-the-art open-source model for **fast** feedforward 3D reconstruction from a single image, collaboratively developed by [Tripo AI](https://www.tripo3d.ai/) and [Stability AI](https://stability.ai/).
-<br><br>
-Leveraging the principles of the [Large Reconstruction Model (LRM)](https://yiconghong.me/LRM/), 2D to 3D brings to the table key advancements that significantly boost both the speed and quality of 3D reconstruction. Our model is distinguished by its ability to rapidly process inputs, generating high-quality 3D models in less than 0.5 seconds on an NVIDIA A100 GPU. 2D to 3D has exhibited superior performance in both qualitative and quantitative evaluations, outperforming other open-source alternatives across multiple public datasets. The figures below illustrate visual comparisons and metrics showcasing 2D to 3D's performance relative to other leading models. Details about the model architecture, training process, and comparisons can be found in this [technical report](https://arxiv.org/abs/2403.02151).
-
-<!--
-<div align="center">
-  <img src="figures/comparison800.gif" alt="Teaser Video">
-</div>
--->
-<p align="center">
-    <img width="800" src="figures/visual_comparisons.jpg"/>
-</p>
+[![Model Card](https://img.shields.io/badge/%F0%9F%A4%97%20Model_Card-Huggingface-orange)](https://huggingface.co/stabilityai/TripoSR) [![Gradio Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Gradio%20Demo-Huggingface-orange)](https://huggingface.co/spaces/stabilityai/TripoSR) [![Paper](https://img.shields.io/badge/%F0%9F%A4%97%20Paper-Huggingface-orange)](https://huggingface.co/papers/2403.02151) [![ArXiv](https://img.shields.io/badge/Arxiv-2403.02151-B31B1B.svg)](https://arxiv.org/abs/2403.02151)
 
 <p align="center">
-    <img width="450" src="figures/scatter-comparison.png"/>
+  <img src="figures/teaser800.gif" alt="Teaser" />
 </p>
 
+Overview
+--------
 
-The model is released under the MIT license, which includes the source code, pretrained models, and an interactive online demo. Our goal is to empower researchers, developers, and creatives to push the boundaries of what's possible in 3D generative AI and 3D content creation.
+This repository implements the 2D3D single-image reconstruction model (research by Tripo AI + Stability AI). It focuses on fast feedforward reconstruction that produces a mesh (OBJ) and either per-vertex colors or a baked texture map from a single input image.
 
-## Getting Started
-### Installation
-- Python >= 3.8
-- Install CUDA if available
-- Install PyTorch according to your platform: [https://pytorch.org/get-started/locally/](https://pytorch.org/get-started/locally/) **[Please make sure that the locally-installed CUDA major version matches the PyTorch-shipped CUDA major version. For example if you have CUDA 11.x installed, make sure to install PyTorch compiled with CUDA 11.x.]**
-- Update setuptools by `pip install --upgrade setuptools`
-- Install other dependencies by `pip install -r requirements.txt`
+What you'll find here
+- `run.py`: command-line inference for one or more images
+- `gradio_app.py` / `gradio_single.py`: small local web demos for quick interactive testing
+- `models/`: model code, renderers, tokenizers, and supporting modules
+- `tsr/`: texture-baking and rendering utilities (`bake_texture.py`, `system.py`)
+- `examples/`: sample input images (e.g., `examples/chair.png`)
+- `figures/`: assets used in this README
 
-### Manual Inference
-```sh
+Quick Start
+-----------
+
+Requirements
+- Python 3.8+
+- PyTorch (install the wheel matching your CUDA version): https://pytorch.org/get-started/locally/
+- Optional: CUDA for GPU acceleration
+
+Install dependencies
+
+```powershell
+pip install --upgrade setuptools
+pip install -r requirements.txt
+```
+
+Run inference (single image)
+
+```powershell
 python run.py examples/chair.png --output-dir output/
 ```
-This will save the reconstructed 3D model to `output/`. You can also specify more than one image path separated by spaces. The default options takes about **6GB VRAM** for a single image input.
 
-If you would like to output a texture instead of vertex colors, use the `--bake-texture` option. You may also use `--texture-resolution` to specify the resolution in pixels of the output texture.
+Notes
+- You can pass multiple image paths to `run.py` separated by spaces.
+- VRAM usage depends on options; default runs typically require ~6GB (varies by GPU).
+- See `python run.py --help` for all available flags.
 
-For detailed usage of this script, use `python run.py --help`.
+Texture baking
+- Add `--bake-texture` to bake a texture map instead of using per-vertex colors.
+- Use `--texture-resolution <N>` to set the baked texture size (e.g., `--texture-resolution 1024`).
 
-### Local Gradio App
-```sh
+Local demo
+
+```powershell
 python gradio_app.py
 ```
 
-## Troubleshooting
-> AttributeError: module 'torchmcubes_module' has no attribute 'mcubes_cuda'
+Example outputs
+---------------
+When inference completes, expected files in `--output-dir` include:
+- `<basename>_mesh.obj`  reconstructed mesh (OBJ)
+- `<basename>_preview.png`  a rendered preview image
+- `<basename>_texture.png`  baked texture (if `--bake-texture` used)
+- additional metadata files depending on flags
 
-or
+Repository Layout (short)
+- `run.py`  CLI inference
+- `gradio_app.py`, `gradio_single.py`  demo apps
+- `models/`  model implementation and rendering utilities
+- `tsr/`  texture baking / helper scripts
+- `examples/`  sample inputs
+- `figures/`  README/demo images
+- `output_test/`  developer/test outputs
 
-> torchmcubes was not compiled with CUDA support, use CPU version instead.
+Troubleshooting
+---------------
 
-This is because `torchmcubes` is compiled without CUDA support. Please make sure that 
+Problem: `AttributeError: module 'torchmcubes_module' has no attribute 'mcubes_cuda'` or a message that `torchmcubes` was compiled without CUDA.
 
-- The locally-installed CUDA major version matches the PyTorch-shipped CUDA major version. For example if you have CUDA 11.x installed, make sure to install PyTorch compiled with CUDA 11.x.
-- `setuptools>=49.6.0`. If not, upgrade by `pip install --upgrade setuptools`.
+Cause: `torchmcubes` was installed/built without CUDA support or PyTorch wheel/CUDA major versions are mismatched.
 
-Then re-install `torchmcubes` by:
+Quick fix
 
-```sh
+```powershell
+pip install --upgrade setuptools
 pip uninstall torchmcubes
 pip install git+https://github.com/tatsy/torchmcubes.git
 ```
 
-## Citation
-```BibTeX
+Ensure the PyTorch CUDA major version (e.g., CUDA 11.x) matches your installed CUDA and the wheel you installed. If you don't have CUDA, install the CPU-only builds.
+
+Citation
+--------
+
+If you use this code or model in your research, please cite:
+
+```bibtex
 @article{TripoSR2024,
   title={2D to 3D: Fast 3D Object Reconstruction from a Single Image},
-  author={Tochilkin, Dmitry and Pankratz, David and Liu, Zexiang and Huang, Zixuan and and Letts, Adam and Li, Yangguang and Liang, Ding and Laforte, Christian and Jampani, Varun and Cao, Yan-Pei},
+  author={Tochilkin, Dmitry and Pankratz, David and Liu, Zexiang and Huang, Zixuan and Letts, Adam and Li, Yangguang and Liang, Ding and Laforte, Christian and Jampani, Varun and Cao, Yan-Pei},
   journal={arXiv preprint arXiv:2403.02151},
   year={2024}
 }
 ```
+
+License
+-------
+This project is provided under the MIT license.
+
+Contributing / Next steps
+-------------------------
+
+- If you want, I can add a short example section showing a full command + resulting filenames from a sample run.
+- I can also run the local Gradio demo and provide copy-paste commands for Windows PowerShell to launch it.
